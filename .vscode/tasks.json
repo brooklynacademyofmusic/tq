@@ -63,6 +63,22 @@
 			"options": {
 				"cwd": "${workspaceFolder}/azure"
 			}
+		},
+		{
+			"type": "shell",
+			"label": "build for Azure development",
+			"command": "go build -o azure/bin",
+		},
+		{
+			"type": "shell",
+			"label": "build for Azure deployment",
+			"command": "go build -o azure/bin",
+			"options": {
+				"env": {
+					"GOARCH": "amd64",
+					"GOOS": "linux"
+				}
+			}
 		}
 	]
 }
