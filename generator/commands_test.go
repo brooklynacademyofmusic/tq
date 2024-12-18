@@ -12,32 +12,39 @@ import (
 
 func Test_Describe(t *testing.T) {
 
-	short, long := describe("ConstituentsGet")
+	short, long, resource := describe("ConstituentsGet")
 	assert.Equal(t, "Constituents", short)
+	assert.Equal(t, "/CRM/Constituents", resource)
 	assert.Equal(t, "Get the details of a Constituent using id.", long)
 
-	short, long = describe("ConstituentsUpdate")
+	short, long, resource = describe("ConstituentsUpdate")
 	assert.Equal(t, "Constituents", short)
+	assert.Equal(t, "/CRM/Constituents", resource)
 	assert.Equal(t, "Update a constituent. Only the information about constituent can be updated. If addresses, electronicAddresses, salutations or phones data are passed, they will be ignored.", long)
 
-	short, long = describe("ConstituentsCreateConstituent")
+	short, long, resource = describe("ConstituentsCreateConstituent")
 	assert.Equal(t, "Constituents", short)
+	assert.Equal(t, "/CRM/Constituents/Detail", resource)
 	assert.Equal(t, "Create a new constituent with addresses, electronicAddresses, salutations and phones.", long)
 
-	short, long = describe("ElectronicAddressesGet")
+	short, long, resource = describe("ElectronicAddressesGet")
 	assert.Equal(t, "ElectronicAddresses", short)
+	assert.Equal(t, "/CRM/ElectronicAddresses", resource)
 	assert.Equal(t, "Get details of an electronic address.", long)
 
-	short, long = describe("ElectronicAddressesUpdate")
+	short, long, resource = describe("ElectronicAddressesUpdate")
 	assert.Equal(t, "ElectronicAddresses", short)
+	assert.Equal(t, "/CRM/ElectronicAddresses", resource)
 	assert.Equal(t, "Update an electronic address.", long)
 
-	short, long = describe("ElectronicAddressesCreate")
+	short, long, resource = describe("ElectronicAddressesCreate")
 	assert.Equal(t, "ElectronicAddresses", short)
+	assert.Equal(t, "/CRM/ElectronicAddresses", resource)
 	assert.Equal(t, "Create a new electronic address.", long)
 
-	short, long = describe("AssociationTypesGet")
+	short, long, resource = describe("AssociationTypesGet")
 	assert.Equal(t, "AssociationTypes", short)
+	assert.Equal(t, "/ReferenceData/AssociationTypes", resource)
 	assert.Equal(t, "Get the details of an association type by id. To get the resource only if the user has write/edit access, pass filter=\"writeonly\". To get the resources in maintenance mode(ignore Control Groups), pass maintenanceMode=\"true\". Maintenance mode requires users to have access to the reference tables. (Specified in TX_REFTABLE_USERGROUP).", long)
 
 }

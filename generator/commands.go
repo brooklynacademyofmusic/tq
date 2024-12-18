@@ -19,6 +19,8 @@ type command struct {
 	Verb string
 	// the Tessi entity that is being invoked
 	Thing string
+	// the Tessi security resource that is being used
+	Resource string
 	// an adverb used to separate functions for the same verb/thing
 	Variant string
 	// the first sentence or clause of the swagger documentation for this command
@@ -49,10 +51,10 @@ func init() {
 }
 
 // Reads the Tessitura swagger spec and extracts documentation info
-func describe(funcName string) (thing string, long string) {
+func describe(funcName string) (thing string, long string, resource string) {
 
 	// now find the corresponding operation in the swagger spec!
-	for _, path := range swagger.Paths.Paths {
+	for key, path := range swagger.Paths.Paths {
 		for _, op := range []*spec.Operation{
 			path.Get, path.Put, path.Post, path.Delete, path.Head,
 		} {
@@ -65,9 +67,11 @@ func describe(funcName string) (thing string, long string) {
 				thing = regexp.MustCompile("_.+").ReplaceAllString(op.ID, "")
 
 				long = op.Summary
+				resource = regexp.MustCompile("/\\{.+\\}").ReplaceAllString(key, "")
 
 				return
 			}
+
 		}
 	}
 
@@ -210,7 +214,7 @@ func usage(method reflect.Method) string {
 // Short is derived from Long by cutting at punctuation or newline.
 // Usage comes from usage(method.Name)
 func newCommand(method reflect.Method) command {
-	thing, long := describe(method.Name)
+	thing, long, resource := describe(method.Name)
 	stopWords := []string{"Get", "Update", "Create", "Delete", thing}
 	variant := method.Name
 	verb := ""
@@ -222,14 +226,15 @@ func newCommand(method reflect.Method) command {
 	}
 	short := regexp.MustCompile(`[\.,\n]`).Split(long, 2)[0]
 	return command{
-		Name:    method.Name,
-		Verb:    verb,
-		Thing:   thing,
-		Short:   short,
-		Variant: variant,
-		Long:    long,
-		Usage:   usage(method),
-		Aliases: []string{short},
+		Name:     method.Name,
+		Resource: resource,
+		Verb:     verb,
+		Thing:    thing,
+		Short:    short,
+		Variant:  variant,
+		Long:     long,
+		Usage:    usage(method),
+		Aliases:  []string{short},
 	}
 
 }

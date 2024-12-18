@@ -146,6 +146,14 @@ func init() {
 			".Example", ".Example | exampleWrapped "+fmt.Sprint(width)).
 			Replace(rootCmd.UsageTemplate()))
 
+	// Add resource info
+	rootCmd.SetUsageTemplate(strings.NewReplacer("Query:",
+		`Resource:
+  {{.Annotations.resource}}
+
+Query:`).
+		Replace(rootCmd.UsageTemplate()))
+
 	cobra.AddTemplateFuncs(
 		template.FuncMap{
 			"flagUsagesWrapped": flagUsagesWrapped,
