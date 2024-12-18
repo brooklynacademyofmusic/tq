@@ -5,35 +5,9 @@ import (
 	"testing"
 
 	"github.com/99designs/keyring"
-	"github.com/skysyzygy/tq/auth"
 	"github.com/skysyzygy/tq/tq"
 	"github.com/stretchr/testify/assert"
 )
-
-// authFromInput gets auth data from the command line or env
-func Test_authFromInput(t *testing.T) {
-	initConfig()
-
-	*hostname = "https://tessitura.api/basePath"
-	*username = "user"
-	*usergroup = "group"
-	*location = "location"
-	os.Setenv("TQ_LOGIN", "another/host|user|group|location")
-	defer func() { os.Unsetenv("TQ_LOGIN") }()
-
-	assert.Equal(t, auth.New(
-		"https://tessitura.api/basePath", "user", "group", "location", nil),
-		authFromInput())
-
-	*hostname = ""
-	*username = ""
-	*usergroup = ""
-	*location = ""
-	assert.Equal(t, auth.New(
-		"another/host", "user", "group", "location", nil),
-		authFromInput())
-
-}
 
 // authenticateAddCmd adds an auth method
 func Test_authenticateAddCmd(t *testing.T) {

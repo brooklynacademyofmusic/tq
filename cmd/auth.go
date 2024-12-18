@@ -50,18 +50,6 @@ func (pr stdinPasswordReader) ReadPassword() ([]byte, error) {
 	return io.ReadAll(os.Stdin)
 }
 
-func authFromInput() (a auth.Auth) {
-	if *hostname != "" ||
-		*username != "" ||
-		*usergroup != "" ||
-		*location != "" {
-		a = auth.New(*hostname, *username, *usergroup, *location, nil)
-	} else {
-		a, _ = auth.FromString(viper.GetString("login"))
-	}
-	return
-}
-
 var authenticateAddCmd = &cobra.Command{
 	Use:     "add",
 	Aliases: []string{"a", "add"},
@@ -108,7 +96,7 @@ var authenticateDeleteCmd = &cobra.Command{
 	Aliases: []string{"d", "del", "rm"},
 	Short:   `Delete a Tessitura API authentication method`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		a := authFromInput()
+		a := auth.New(*hostname, *username, *usergroup, *location, nil)
 		return a.Delete(keys)
 	},
 }
@@ -118,7 +106,7 @@ var authenticateSelectCmd = &cobra.Command{
 	Aliases: []string{"s", "sel"},
 	Short:   `Select a Tessitura API authentication method`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		a := authFromInput()
+		a := auth.New(*hostname, *username, *usergroup, *location, nil)
 		err := a.Load(keys)
 		if err != nil {
 			return err
@@ -136,7 +124,7 @@ var authenticateValidateCmd = &cobra.Command{
 	Short:   `Validate a Tessitura API authentication method with the server`,
 	PreRun:  func(cmd *cobra.Command, args []string) { getEnv() },
 	RunE: func(cmd *cobra.Command, args []string) error {
-		a := authFromInput()
+		a := auth.New(*hostname, *username, *usergroup, *location, nil)
 		err := a.Load(keys)
 		if err != nil {
 			return err
@@ -164,7 +152,7 @@ func init() {
 }
 
 // set parameters based on environment variable. Only used for auth add and auth validate.
-// auth select would be a no-op (because it's already selected) and auth delete is dangerous
+// auth select would be a no-op (because it's already selected) and auth delete would be dangerous
 func getEnv() {
 	if *hostname == "" && *username == "" && *usergroup == "" && *location == "" {
 		if a, err := auth.FromString(viper.GetString("Login")); err == nil {
