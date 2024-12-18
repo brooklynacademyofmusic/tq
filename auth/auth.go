@@ -31,6 +31,18 @@ func (a Auth) Hostname() string {
 	return a.hostname
 }
 
+func (a Auth) Username() string {
+	return a.username
+}
+
+func (a Auth) Usergroup() string {
+	return a.usergroup
+}
+
+func (a Auth) Location() string {
+	return a.location
+}
+
 // Build the authentication string used for storing the password in the keystore
 func (a Auth) String() (string, error) {
 	if strings.Contains(a.hostname, "|") ||
