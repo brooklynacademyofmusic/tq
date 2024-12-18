@@ -5,36 +5,49 @@ Get the details of a Constituent using id.
 Usage:
   tq get Constituents [flags]
 
+Resource:
+  /CRM/Constituents
+
 Query:
   {"ConstituentID":"string"}
 
 
 Flags:
       --constituent                 Get constituent details with addresses, electronicAddresses, salutations and phones. To exclude information about visible affiliations pass includeAffiliations="false"
+                                    Resource:
+                                      /CRM/Constituents/Detail
                                     Query:
-                                    {"ConstituentID":"string", "IncludeAffiliations":"string"}
+                                      {"ConstituentID":"string", "IncludeAffiliations":"string"}
       --constituentdevelopmentinfo  Get constituent information for fundraising.
+                                    Resource:
+                                      /CRM/Constituents/DevelopmentInfo
                                     Query:
-                                    {"ConstituentID":"string"}
+                                      {"ConstituentID":"string"}
       --constituents                Get multiple Constituents given a set of constituentIds.
                                     Query:
-                                    {"ConstituentIds":"string"}
+                                      {"ConstituentIds":"string"}
       --constituentsnapshot         Get constituent details along with primary address, primary salutation, primary electronic address, phones and affiliates information.
+                                    Resource:
+                                      /CRM/Constituents/Snapshot
                                     Query:
-                                    {"ConstituentID":"string"}
+                                      {"ConstituentID":"string"}
       --defaultheader               Return the default header for the constituent, including configured flexible header names and values.
+                                    Resource:
+                                      /CRM/Constituents/Header/Default
                                     Query:
-                                    {"ConstituentID":"string"}
+                                      {"ConstituentID":"string"}
       --flexheader                  Get the details of a flex header for a constituent
                                     Query:
-                                    {"ConstituentID":"string", "HeaderID":"string"}
+                                      {"ConstituentID":"string", "HeaderID":"string"}
       --header                      Return constituent header details, including configured flexible header names and values.
                                     Query:
-                                    {"ConstituentID":"string", "HeaderID":"string"}
+                                      {"ConstituentID":"string", "HeaderID":"string"}
   -h, --help                        help for Constituents
       --primaryhousehold            Get primary household constituent details for a provided constituentId.
+                                    Resource:
+                                      /CRM/Constituents/PrimaryHousehold
                                     Query:
-                                    {"ConstituentID":"string"}
+                                      {"ConstituentID":"string"}
       --search                      Search for constituents using one of four possible search modes.  Querystring parameters are valid based on the "type" parameter value.
                                     Single Line (type=fluent)
                                     Sample:  CRM/Constituents/Search?type=fluent&amp;q=Huff
@@ -47,8 +60,10 @@ Flags:
                                     Basic search type permits parameters constituentId, ln, fn, street, and post. Sample URL: CRM/Constituents/Search?type=basic&amp;ln=Huff&amp;fn=Frank&amp;post=20746
                                     Advanced search type permits parameters atype, op, and value. Sample URL:  CRM/Constituents/Search?type=advanced&amp;atype=Email&amp;op=Like&amp;value=%25@gmail.com
                                     Attribute search type permits parameters key, op, value. Sample URL:  CRM/Constituents/Search?type=attribute&amp;key=Board+Affiliation&amp;op=Equals&amp;value=Association+Member
+                                    Resource:
+                                      /CRM/Constituents/Search
                                     Query:
-                                    {"Atype":"string", "ConstituencyIds":"string", "ConstituentGroups":"string", "ConstituentID":"string", "Dup":"string", "Fn":"string", "IncludeAffiliates":"string", "Key":"string", "ListID":"string", "Ln":"string", "Op":"string", "Page":"string", "PageSize":"string", "Post":"string", "Q":"string", "Street":"string", "Type":"string", "Value":"string"}
+                                      {"Atype":"string", "ConstituencyIds":"string", "ConstituentGroups":"string", "ConstituentID":"string", "Dup":"string", "Fn":"string", "IncludeAffiliates":"string", "Key":"string", "ListID":"string", "Ln":"string", "Op":"string", "Page":"string", "PageSize":"string", "Post":"string", "Q":"string", "Street":"string", "Type":"string", "Value":"string"}
 
 Global Flags:
   -c, --compact       compact instead of indented output
