@@ -163,8 +163,9 @@ func init() {
 		authenticateDeleteCmd, authenticateSelectCmd, authenticateValidateCmd)
 }
 
+// set parameters based on environment variable. Only used for auth add and auth validate.
+// auth select would be a no-op (because it's already selected) and auth delete is dangerous
 func getEnv() {
-	// set parameters based on environment variable
 	if *hostname == "" && *username == "" && *usergroup == "" && *location == "" {
 		if a, err := auth.FromString(viper.GetString("Login")); err == nil {
 			*hostname = a.Hostname()
