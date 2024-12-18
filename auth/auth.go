@@ -79,7 +79,7 @@ func New(hostname string, username string, usergroup string, location string, pa
 	// strip protocol from hostname if it exists
 	hostname = regexp.MustCompile("^.+//").ReplaceAllString(hostname, "")
 	// sanitize
-	regex := regexp.MustCompile(`[^a-zA-Z0-9-\.\\/]`)
+	regex := regexp.MustCompile(`[^a-zA-Z0-9-\.\\/:]`)
 	hostname = regex.ReplaceAllString(hostname, "")
 	username = regex.ReplaceAllString(username, "")
 	usergroup = regex.ReplaceAllString(usergroup, "")
