@@ -143,3 +143,16 @@ func Test_authenticateDeleteCmd(t *testing.T) {
 	_, err = keys.Get("tessitura.api/basePath|user|group|location")
 	assert.Error(t, err)
 }
+
+// getEnv works with environment variables
+func Test_getEnv(t *testing.T) {
+
+	os.Setenv("TQ_LOGIN", "server.com/path|me|us|here")
+	initConfig()
+	getEnv()
+	assert.Equal(t, "server.com/path", *hostname)
+	assert.Equal(t, "me", *username)
+	assert.Equal(t, "us", *usergroup)
+	assert.Equal(t, "here", *location)
+
+}
