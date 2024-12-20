@@ -11,15 +11,20 @@
             "mode": "auto",
             "program": "${fileDirname}"
         },
-
-
-        
         {
             "name": "Launch App",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}"
+        },
+        {
+            "name": "Attach to Node Functions",
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "port": 9229,
+            "preLaunchTask": "func: host start"
         }
     ]
 }

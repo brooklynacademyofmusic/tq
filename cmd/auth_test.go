@@ -9,6 +9,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// getEnv works with environment variables
+func Test_getEnv(t *testing.T) {
+	os.Setenv("TQ_LOGIN", "server.com/path|me|us|here")
+	initConfig()
+	getEnv()
+
+	assert.Equal(t, "server.com/path", *hostname)
+	assert.Equal(t, "me", *username)
+	assert.Equal(t, "us", *usergroup)
+	assert.Equal(t, "here", *location)
+
+}
+
 // authenticateAddCmd adds an auth method
 func Test_authenticateAddCmd(t *testing.T) {
 	// test that the https gets removed

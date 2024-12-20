@@ -54,6 +54,7 @@ var authenticateAddCmd = &cobra.Command{
 	Use:     "add",
 	Aliases: []string{"a", "add"},
 	Short:   "Add an Tessitura API authentication method",
+	PreRun:  func(cmd *cobra.Command, args []string) { getEnv() },
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Print("Password: ")
 		var (
@@ -121,6 +122,7 @@ var authenticateValidateCmd = &cobra.Command{
 	Use:     "validate",
 	Aliases: []string{"v", "val"},
 	Short:   `Validate a Tessitura API authentication method with the server`,
+	PreRun:  func(cmd *cobra.Command, args []string) { getEnv() },
 	RunE: func(cmd *cobra.Command, args []string) error {
 		a := auth.New(*hostname, *username, *usergroup, *location, nil)
 		err := a.Load(keys)
@@ -147,4 +149,17 @@ func init() {
 
 	authenticateCmd.AddCommand(authenticateAddCmd, authenticateListCmd,
 		authenticateDeleteCmd, authenticateSelectCmd, authenticateValidateCmd)
+}
+
+// set parameters based on environment variable. Only used for auth add and auth validate.
+// auth select would be a no-op (because it's already selected) and auth delete would be dangerous
+func getEnv() {
+	if *hostname == "" && *username == "" && *usergroup == "" && *location == "" {
+		if a, err := auth.FromString(viper.GetString("Login")); err == nil {
+			*hostname = a.Hostname()
+			*username = a.Username()
+			*usergroup = a.Usergroup()
+			*location = a.Location()
+		}
+	}
 }

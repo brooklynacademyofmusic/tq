@@ -18,6 +18,7 @@ var {{ print $op "_" $name "_cmd" }} = &cobra.Command{
 		Example: `{{ $command.Usage }}`,
 		Short: `{{ $command.Short }}`,
 		Long:  `{{ $command.Long }}`,
+		Annotations: map[string]string{"resource": `{{ $command.Resource }}`},
 		PreRunE: initTq,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			{{ if gt (len $commands) 1 -}}
@@ -44,10 +45,16 @@ func init() {
 	{{- range $op, $commands := $ops }}
 	{{- if eq $op $selectedOp }}
 		{{ $op }}_cmd.AddCommand({{ print $op "_" $name "_cmd" }})
+		{{- $command := index $commands 0 }}
 		{{- if gt (len $commands) 1 }}
 			{{- range slice $commands 1 }} 
-				{{ print $op "_" $name "_cmd" }}.Flags().Bool("{{ .Variant }}", false, 
-					`{{ .Long }}` + "\nQuery:\n" + `{{ .Usage }}`)
+				{{ print $op "_" $name "_cmd" }}.Flags().Bool(
+				"{{ .Variant }}", false, `{{ .Long }}` + 
+				{{- if ne .Resource $command.Resource -}}
+					"\nResource:\n  " + `{{ .Resource }}` +
+				{{- end }}
+				"\nQuery:\n  " + `{{ .Usage }}`,
+				)
 			{{- end }} 
 		{{- end }}
 	{{- end }}

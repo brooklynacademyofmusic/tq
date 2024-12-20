@@ -5,36 +5,55 @@ Create a new constituent with addresses, electronicAddresses, salutations and ph
 Usage:
   tq create Constituents [flags]
 
+Resource:
+  /CRM/Constituents/Detail
+
 Query:
   {"Addresses[0].Id":123, "ConstituentType.Id":123, "CreateLocation":"string", "CreatedBy":"string", "CreatedDateTime":"2000-01-01T00:00:00.000Z", "DisplayName":"string", "ElectronicAddresses[0].Id":123, "EmarketIndicator.Id":123, "FirstName":"string", "Gender.Id":123, "Id":123, "Inactive.Id":123, "InactiveReason.Id":123, "LastActivityDate":"2000-01-01T00:00:00.000Z", "LastGiftDate":"2000-01-01T00:00:00.000Z", "LastName":"string", "LastTicketDate":"2000-01-01T00:00:00.000Z", "MailIndicator.Id":123, "MiddleName":"string", "NameStatus.Id":123, "OriginalSource.Id":123, "PhoneIndicator.Id":123, "PhoneNumbers[0].Id":123, "Prefix.Id":123, "ProtectionType.Id":123, "Salutations[0].Id":123, "SortName":"string", "Suffix.Id":123, "UpdatedBy":"string", "UpdatedDateTime":"2000-01-01T00:00:00.000Z"}
 
 
 Flags:
       --constituentusingsnapshot         Create a constituent optionally with primary address, primary salutation, primary electronic address, primary &amp; general phones and affiliates information.
+                                         Resource:
+                                           /CRM/Constituents/Snapshot
                                          Query:
-                                         {"Address.Id":123, "Affiliates[0].Id":123, "ConstituentType.Id":123, "CreateLocation":"string", "CreatedBy":"string", "CreatedDateTime":"2000-01-01T00:00:00.000Z", "DisplayName":"string", "EditIndicator":true, "ElectronicAddress.Id":123, "EmarketIndicator.Id":123, "FirstName":"string", "Gender.Id":123, "Id":123, "Inactive.Id":123, "InactiveReason.Id":123, "LastActivityDate":"2000-01-01T00:00:00.000Z", "LastName":"string", "MailIndicator.Id":123, "MiddleName":"string", "NameStatus.Id":123, "OriginalSource.Id":123, "PhoneIndicator.Id":123, "Prefix.Id":123, "PrimaryPhoneNumbers[0].Id":123, "ProtectionType.Id":123, "Salutation.Id":123, "ShortDisplayName":"string", "SortName":"string", "Suffix.Id":123, "UpdatedBy":"string", "UpdatedDateTime":"2000-01-01T00:00:00.000Z"}
+                                           {"Address.Id":123, "Affiliates[0].Id":123, "ConstituentType.Id":123, "CreateLocation":"string", "CreatedBy":"string", "CreatedDateTime":"2000-01-01T00:00:00.000Z", "DisplayName":"string", "EditIndicator":true, "ElectronicAddress.Id":123, "EmarketIndicator.Id":123, "FirstName":"string", "Gender.Id":123, "Id":123, "Inactive.Id":123, "InactiveReason.Id":123, "LastActivityDate":"2000-01-01T00:00:00.000Z", "LastName":"string", "MailIndicator.Id":123, "MiddleName":"string", "NameStatus.Id":123, "OriginalSource.Id":123, "PhoneIndicator.Id":123, "Prefix.Id":123, "PrimaryPhoneNumbers[0].Id":123, "ProtectionType.Id":123, "Salutation.Id":123, "ShortDisplayName":"string", "SortName":"string", "Suffix.Id":123, "UpdatedBy":"string", "UpdatedDateTime":"2000-01-01T00:00:00.000Z"}
       --convertgrouptoindividual         Convert existing household to an individual.
+                                         Resource:
+                                           /CRM/Constituents/ConvertToIndividual
                                          Query:
-                                         {"AffiliationIdsToBeDeleted[0]":0, "AffiliationsToAssociationsInfo[0].AffiliationId":123, "AffiliationsToAssociationsInfo[0].AssociationTypeId":123, "AssociationIdsToBeDeleted[0]":0, "AssociationsToAffiliationsInfo[0].AffiliationTypeId":123, "AssociationsToAffiliationsInfo[0].AssociationId":123, "ConstituentID":"string", "IndividualConstituent.FirstName":"string", "IndividualConstituent.GenderId":123, "IndividualConstituent.LastName":"string", "IndividualConstituent.MiddleName":"string", "IndividualConstituent.PrefixId":123, "IndividualConstituent.SuffixId":123, "Merge.ConstituentIdToDelete":123, "Merge.ConstituentIdToKeep":123}
+                                           {"AffiliationIdsToBeDeleted[0]":0, "AffiliationsToAssociationsInfo[0].AffiliationId":123, "AffiliationsToAssociationsInfo[0].AssociationTypeId":123, "AssociationIdsToBeDeleted[0]":0, "AssociationsToAffiliationsInfo[0].AffiliationTypeId":123, "AssociationsToAffiliationsInfo[0].AssociationId":123, "ConstituentID":"string", "IndividualConstituent.FirstName":"string", "IndividualConstituent.GenderId":123, "IndividualConstituent.LastName":"string", "IndividualConstituent.MiddleName":"string", "IndividualConstituent.PrefixId":123, "IndividualConstituent.SuffixId":123, "Merge.ConstituentIdToDelete":123, "Merge.ConstituentIdToKeep":123}
       --convertindividualtohousehold     Convert existing individual constituent to a household.
+                                         Resource:
+                                           /CRM/Constituents/ConvertToHousehold
                                          Query:
-                                         {"AffiliationTypeId":123, "ConstituentID":"string", "ConstituentTypeId":123}
+                                           {"AffiliationTypeId":123, "ConstituentID":"string", "ConstituentTypeId":123}
       --convertindividualtoorganization  Convert existing individual constituent to an organization.
+                                         Resource:
+                                           /CRM/Constituents/ConvertToOrganization
                                          Query:
-                                         {"AffiliationIdsToBeDeleted[0]":0, "AffiliationsToAssociationsInfo[0].AffiliationId":123, "AffiliationsToAssociationsInfo[0].AssociationTypeId":123, "AssociationIdsToBeDeleted[0]":0, "AssociationsToAffiliationsInfo[0].AffiliationTypeId":123, "AssociationsToAffiliationsInfo[0].AssociationId":123, "ConstituentID":"string", "ConstituentTypeId":123, "LastName":"string"}
+                                           {"AffiliationIdsToBeDeleted[0]":0, "AffiliationsToAssociationsInfo[0].AffiliationId":123, "AffiliationsToAssociationsInfo[0].AssociationTypeId":123, "AssociationIdsToBeDeleted[0]":0, "AssociationsToAffiliationsInfo[0].AffiliationTypeId":123, "AssociationsToAffiliationsInfo[0].AssociationId":123, "ConstituentID":"string", "ConstituentTypeId":123, "LastName":"string"}
   -h, --help                             help for Constituents
       --schedulepurge                    Schedule a constituent to be purged.  This only marks a constituent for purge, but does not actually purge the constituent.  If constituent has open transactions or an order for a future performance, a bad request will be returned indicating open transactions.  Pass IgnoreWarnings = true in request to bypass and schedule.
+                                         Resource:
+                                           /CRM/Constituents/Purge/Schedule
                                          Query:
-                                         {"ConstituentID":"string", "IgnoreWarnings":true}
+                                           {"ConstituentID":"string", "IgnoreWarnings":true}
       --searchbycardnumber               Search for constituents by card number.
+                                         Resource:
+                                           /CRM/Constituents/Search/ByCardNumber
                                          Query:
-                                         {"CardNumber":"string"}
+                                           {"CardNumber":"string"}
       --swapconstituenta1a2              Swaps A1/A2 names on a household account and regenerates its salutation.
+                                         Resource:
+                                           /CRM/Constituents/Snapshot/SwapA1A2
                                          Query:
-                                         {"ConstituentID":"string"}
+                                           {"ConstituentID":"string"}
       --unschedulepurge                  Unschedule a constituent that has been previously set to be purged.  If a purge has been completed, an error will be returned.
+                                         Resource:
+                                           /CRM/Constituents/Purge/Unschedule
                                          Query:
-                                         {"ConstituentID":"string"}
+                                           {"ConstituentID":"string"}
 
 Global Flags:
   -c, --compact       compact instead of indented output

@@ -31,6 +31,18 @@ func (a Auth) Hostname() string {
 	return a.hostname
 }
 
+func (a Auth) Username() string {
+	return a.username
+}
+
+func (a Auth) Usergroup() string {
+	return a.usergroup
+}
+
+func (a Auth) Location() string {
+	return a.location
+}
+
 // Build the authentication string used for storing the password in the keystore
 func (a Auth) String() (string, error) {
 	if strings.Contains(a.hostname, "|") ||
@@ -66,7 +78,12 @@ func FromString(str string) (Auth, error) {
 func New(hostname string, username string, usergroup string, location string, password []byte) Auth {
 	// strip protocol from hostname if it exists
 	hostname = regexp.MustCompile("^.+//").ReplaceAllString(hostname, "")
-
+	// sanitize
+	regex := regexp.MustCompile(`[^a-zA-Z0-9-\.\\/:]`)
+	hostname = regex.ReplaceAllString(hostname, "")
+	username = regex.ReplaceAllString(username, "")
+	usergroup = regex.ReplaceAllString(usergroup, "")
+	location = regex.ReplaceAllString(location, "")
 	return Auth{hostname, username, usergroup, location, password}
 }
 

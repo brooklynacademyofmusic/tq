@@ -11,7 +11,7 @@ import (
 
 // Requires:
 // * admin privileges to an Azure Key Vault with soft delete enabled
-// * environment varialbe AZURE_KEY_VAULT set to the key vault name
+// * environment variable AZURE_KEY_VAULT set to the key vault name
 func TestAuth_Azure(t *testing.T) {
 	keys_azure := Keyring_Azure{}
 

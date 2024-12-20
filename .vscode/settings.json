@@ -1,0 +1,12 @@
+{
+    "go.testEnvFile": "${workspaceFolder}/.vscode/secrets.env",
+    "azureFunctions.deploySubpath": "azure",
+    "azureFunctions.postDeployTask": "npm install (functions)",
+    "azureFunctions.projectLanguage": "TypeScript",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectLanguageModel": 4,
+    "azureFunctions.preDeployTask": "npm prune (functions)",
+    "jest.jestCommandLine": "npx jest",
+    "jest.rootPath": "azure/tests"
+}
