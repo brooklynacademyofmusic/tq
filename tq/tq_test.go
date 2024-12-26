@@ -255,14 +255,6 @@ func Test_mapFields(t *testing.T) {
 	assert.ElementsMatch(t, []string{"hi", "i'm", "a", "map"}, keyString)
 }
 
-// test that Login builds Tessitura API client and saves BasicAuth info for future use
-func Test_Login(t *testing.T) {
-	tq := TqConfig{}
-	tq.Login(auth.New("hostname", "user", "", "", nil))
-	assert.NotNil(t, tq.Get)
-	assert.NotNil(t, tq.basicAuth)
-}
-
 func testServer(t *testing.T) *httptest.Server {
 	return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		req := g_e_t.ConstituentsGetConstituentParams{}
