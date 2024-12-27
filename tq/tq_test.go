@@ -349,6 +349,41 @@ func Test_DoOneNoop(t *testing.T) {
 
 }
 
+// Test that DoOne passes on multiple headers when given
+func Test_DoOneHeaders(t *testing.T) {
+
+	var basicAuth, apiKey string
+	out, _ := json.Marshal(models.Constituent{ID: 0})
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		basicAuth = r.Header.Get("Authorization")
+		apiKey = r.Header.Get("API-Key")
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+	}))
+	defer server.Close()
+
+	// Basic auth is passed and properly encoded
+	tq := TqConfig{}
+	query := []byte(`{"ConstituentId": "0"}`)
+	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	res, err := DoOne(tq, tq.Get.ConstituentsGet, query)
+	assert.Equal(t, out, res)
+	assert.NoError(t, err)
+	assert.Equal(t, "Basic "+base64.StdEncoding.EncodeToString([]byte(`username:::pA$$w0rD`)), basicAuth)
+	assert.Equal(t, "", apiKey)
+
+	// Additional headers are also passed
+	tq = TqConfig{Headers: map[string]string{"API-Key": "abc123"}}
+	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	res, err = DoOne(tq, tq.Get.ConstituentsGet, query)
+	assert.Equal(t, out, res)
+	assert.NoError(t, err)
+	assert.Equal(t, "Basic "+base64.StdEncoding.EncodeToString([]byte(`username:::pA$$w0rD`)), basicAuth)
+	assert.Equal(t, "abc123", apiKey)
+
+}
+
 // Test that Do dispatches to DoOne singularly or in parallel depending on query
 // and returns valid JSON
 func Test_Do(t *testing.T) {
