@@ -21,7 +21,7 @@ func TestAuth_Azure(t *testing.T) {
 	}
 
 	// Try to connect to a vault I don't have access to
-	keys_azure.Connect("not-my-vault")
+	keys_azure.Connect("https://not-my-vault.vault.azure.net")
 	assert.Error(t, keys_azure.Set(item), "not authorized")
 
 	// Connect to a vault I have access to

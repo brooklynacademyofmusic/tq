@@ -24,9 +24,7 @@ func hash(text string) string {
 	return sanitized + "-" + hex.EncodeToString(hash[:])
 }
 
-func (ka *Keyring_Azure) Connect(key_vault_name string) error {
-
-	vaultURI := fmt.Sprintf("https://%s.vault.azure.net/", key_vault_name)
+func (ka *Keyring_Azure) Connect(keyVaultURI string) error {
 
 	// Create a credential using the NewDefaultAzureCredential type.
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
@@ -35,7 +33,7 @@ func (ka *Keyring_Azure) Connect(key_vault_name string) error {
 	}
 
 	// Establish a connection to the Key Vault
-	client, err := azsecrets.NewClient(vaultURI, cred, nil)
+	client, err := azsecrets.NewClient(keyVaultURI, cred, nil)
 	if err != nil {
 		return fmt.Errorf("failed to establish a connection to the Azure key vault: %v", err)
 	}

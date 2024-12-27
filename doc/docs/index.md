@@ -30,7 +30,7 @@ To authenticate with the API server you need to add one or more authentication m
 - Unix 
   - Pass
 - Azure 
-  - Key Vault: enabled as the key manager whenever the environment variable `AZURE_KEY_VAULT` is present and set to the name of the key vault
+  - Key Vault: enabled as the key manager whenever the environment variable `AZURE_KEY_VAULT` is present and set to the fully qualified name of the key vault (e.g. `https://myvault.vault.azure.net`)
 
 ```shell
 tq auth add --host hostname --user username --group usergroup --location location
