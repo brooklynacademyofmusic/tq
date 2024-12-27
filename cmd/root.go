@@ -239,14 +239,17 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 		err = errors.Join(fmt.Errorf("bad login string in config file"), _err, err)
 	}
 
-	if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
-		var keys_azure auth.Keyring_Azure
-		keys_azure.Connect(vault)
-		keys = keys_azure
-	} else {
-		keys, _ = keyring.Open(keyring.Config{
-			ServiceName: "tq",
-		})
+	// get keys from Azure or the local keyring... but only if they haven't already been set
+	if keys == nil {
+		if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
+			var keys_azure auth.Keyring_Azure
+			keys_azure.Connect(vault)
+			keys = keys_azure
+		} else {
+			keys, _ = keyring.Open(keyring.Config{
+				ServiceName: "tq",
+			})
+		}
 	}
 
 	err = errors.Join(a.Load(keys), err)
