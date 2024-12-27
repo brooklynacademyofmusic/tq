@@ -26,7 +26,6 @@ func TestMain(m *testing.M) {
 
 	auth_string, _ := os.LookupEnv("AUTH_STRING")
 	auth_secret, _ := os.LookupEnv("AUTH_SECRET")
-	os.Unsetenv("AZURE_KEY_VAULT")
 
 	keys.Set(keyring.Item{Key: auth_string, Data: []byte(auth_secret)})
 

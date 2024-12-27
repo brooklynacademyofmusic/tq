@@ -25,7 +25,7 @@ func TestAuth_Azure(t *testing.T) {
 	assert.Error(t, keys_azure.Set(item), "not authorized")
 
 	// Connect to a vault I have access to
-	keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
+	keys_azure.Connect(os.Getenv("TEST_AZURE_KEY_VAULT"))
 
 	// List keys
 	keys, err := keys_azure.Keys()
@@ -71,7 +71,7 @@ func TestAuth_Azure_ComplexKey(t *testing.T) {
 	}
 
 	// Connect to a vault I have access to
-	keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
+	keys_azure.Connect(os.Getenv("TEST_AZURE_KEY_VAULT"))
 
 	// List keys
 	keys, err := keys_azure.Keys()
