@@ -19,7 +19,7 @@ var test_cmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		input, _ := _tq.ReadInput()
 		_tq.Log.Info(string(input))
-		return fmt.Errorf(string(input))
+		return fmt.Errorf("%s", string(input))
 	},
 }
 
