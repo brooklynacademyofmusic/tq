@@ -33,7 +33,6 @@ import (
 	"syscall"
 
 	"github.com/99designs/keyring"
-
 	"github.com/skysyzygy/tq/auth"
 	"github.com/skysyzygy/tq/tq"
 	"github.com/spf13/cobra"
@@ -88,7 +87,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLog)
+	cobra.OnInitialize(initConfig, initLog, initKeys)
 
 	// enable case insensitive command names
 	cobra.EnableCaseInsensitive = true
@@ -215,6 +214,21 @@ func initLog() {
 	_tq.SetLogger(log, verbose)
 }
 
+func initKeys() {
+	// get keys from Azure or the local keyring... but only if they haven't already been set
+	if keys == nil {
+		if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
+			var keys_azure auth.Keyring_Azure
+			keys_azure.Connect(vault)
+			keys = keys_azure
+		} else {
+			keys, _ = keyring.Open(keyring.Config{
+				ServiceName: "tq",
+			})
+		}
+	}
+}
+
 // Initializes a tq instance with input from file or stdin
 // and logs it in using the default authentication method.
 // Shouldn't be called until the last minute in order to make sure
@@ -237,19 +251,6 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 	a, _err := auth.FromString(viper.GetString("Login"))
 	if _err != nil {
 		err = errors.Join(fmt.Errorf("bad login string in config file"), _err, err)
-	}
-
-	// get keys from Azure or the local keyring... but only if they haven't already been set
-	if keys == nil {
-		if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
-			var keys_azure auth.Keyring_Azure
-			keys_azure.Connect(vault)
-			keys = keys_azure
-		} else {
-			keys, _ = keyring.Open(keyring.Config{
-				ServiceName: "tq",
-			})
-		}
 	}
 
 	err = errors.Join(a.Load(keys), err)
