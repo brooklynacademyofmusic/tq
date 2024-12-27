@@ -87,7 +87,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLog)
 
 	// enable case insensitive command names
 	cobra.EnableCaseInsensitive = true
@@ -160,16 +160,6 @@ Query:`).
 			"exampleWrapped":    exampleWrapped,
 		})
 
-	if os.Getenv("AZURE_KEY_VAULT") != "" {
-		var keys_azure auth.Keyring_Azure
-		keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
-		keys = keys_azure
-	} else {
-		keys, _ = keyring.Open(keyring.Config{
-			ServiceName: "tq",
-		})
-	}
-
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -204,7 +194,6 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("TQ")
 
-	initLog()
 }
 
 func initLog() {
@@ -242,6 +231,16 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 	a, _err := auth.FromString(viper.GetString("Login"))
 	if _err != nil {
 		err = errors.Join(fmt.Errorf("bad login string in config file"), _err, err)
+	}
+
+	if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
+		var keys_azure auth.Keyring_Azure
+		keys_azure.Connect(vault)
+		keys = keys_azure
+	} else {
+		keys, _ = keyring.Open(keyring.Config{
+			ServiceName: "tq",
+		})
 	}
 
 	err = errors.Join(a.Load(keys), err)
