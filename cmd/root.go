@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"runtime/debug"
+	"slices"
 	"strings"
 	"syscall"
 
@@ -112,6 +113,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&inFile, "file", "f", "", "input file to read (default is to read from stdin)")
 	rootCmd.PersistentFlags().StringVarP(&logFile, "log", "l", "", "log file to write to (default is no log)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "turns on additional diagnostic output")
+	rootCmd.PersistentFlags().StringToStringVar(&_tq.Headers, "headers", nil, "additional headers to pass on outgoing requests in name=value,name=value format")
 
 	//used within tq for wrangling formats
 	rootCmd.PersistentFlags().StringVarP(&_tq.InFmt, "in", "i", "json", "input format (csv or json; default is json); csv implies --inflat")
@@ -128,7 +130,11 @@ func init() {
 
 	// Hide global flags from auth command
 	authenticateCmd.SetUsageFunc(func(cmd *cobra.Command) error {
-		authenticateCmd.InheritedFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = true })
+		authenticateCmd.InheritedFlags().VisitAll(func(f *pflag.Flag) {
+			if !slices.Contains([]string{"headers"}, f.Name) {
+				f.Hidden = true
+			}
+		})
 		return rootCmd.UsageFunc()(cmd)
 	})
 
