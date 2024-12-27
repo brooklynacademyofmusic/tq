@@ -85,6 +85,7 @@ tq [flags] [verb] [object]
 *  **-c, --compact** compact instead of indented output
 *  **-n, --dryrun** don't actually do anything, just show what would have happened
 *  **-f, --file** input file to read (default is to read from stdin)
+*  **--headers** additional headers to include in outgoing requests in name=value,name=value format
 *  **--highlight** render json with syntax highlighting; default is to use highlighting when output is to terminal
 *  **-i, --in** input format (csv or json; default is json); csv implies --inflat
 *  **--inflat** use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format
