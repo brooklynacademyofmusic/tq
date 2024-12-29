@@ -255,6 +255,51 @@ func Test_mapFields(t *testing.T) {
 	assert.ElementsMatch(t, []string{"hi", "i'm", "a", "map"}, keyString)
 }
 
+func testAuthServer(t *testing.T) *httptest.Server {
+	return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		req := models.AuthenticationRequest{}
+		res := models.AuthenticationResponse{}
+
+		reqBody, _ := io.ReadAll(r.Body)
+		json.Unmarshal(reqBody, &req)
+
+		if req.UserName == "user" && req.Password == "password" {
+			res.IsAuthenticated = true
+		} else {
+			w.WriteHeader(400)
+			res.Message = "Invalid password, what were you thinking?"
+		}
+
+		if r.Header.Get("API-Key") == "abc123" {
+			w.WriteHeader(500)
+			res.Message = "Got API key, thank you :)"
+		}
+
+		resBody, _ := json.Marshal(res)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(resBody)
+
+	}))
+}
+
+// test that Validate returns errors and passes headers
+func Test_Validate(t *testing.T) {
+	server := testAuthServer(t)
+	defer server.Close()
+
+	tq := new(TqConfig)
+	err := tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	assert.NoError(t, err)
+
+	err = tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("Pa$$w0rD")))
+	assert.ErrorContains(t, err, "what were you thinking?")
+
+	tq.Headers = make(map[string]string)
+	tq.Headers["API-Key"] = "abc123"
+	err = tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	assert.ErrorContains(t, err, "Got API key")
+}
+
 func testServer(t *testing.T) *httptest.Server {
 	return httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		req := g_e_t.ConstituentsGetConstituentParams{}
