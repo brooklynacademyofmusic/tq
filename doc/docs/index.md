@@ -82,10 +82,10 @@ tq [flags] [verb] [object]
 ```
 
 ## flags:
-*  **-c, --compact** compact instead of indented output
+*  **-c, --compact** compact instead of indented output 
 *  **-n, --dryrun** don't actually do anything, just show what would have happened
 *  **-f, --file** input file to read (default is to read from stdin)
-*  **--headers** additional headers to include in outgoing requests in name=value,name=value format
+*  **--headers** additional headers to include in outgoing requests in name=value,name=value format (or in JSON format when used in the TQ_HEADERS environment variable)
 *  **--highlight** render json with syntax highlighting; default is to use highlighting when output is to terminal
 *  **-i, --in** input format (csv or json; default is json); csv implies --inflat
 *  **--inflat** use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format
@@ -96,11 +96,13 @@ tq [flags] [verb] [object]
 *  **-v, --verbose** turns on additional diagnostic output
 
 
-#### configuration file:
+### configuration file:
 A yaml configuration file `.tq` placed in your home directory can be used to set defaults for these flags; it is also used to save the current authentication method. See `tq auth select --help` for more information. 
 
+### environment variables:
+All flag options can also be set as environment variables, in all caps, with a `TQ_` prefix, for example, `TQ_OUT=csv` will set the output format to csv. 
 
-### verbs:
+## verbs:
 *  **authenticate** : Authenticate with the Tessitura API
 *  **create** :       Create entities in Tessitura
 *  **get** :          Retrieve entities from Tessitura
