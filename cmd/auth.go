@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/skysyzygy/tq/auth"
+	"github.com/skysyzygy/tq/tq"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/term"
@@ -130,8 +131,10 @@ var authenticateValidateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		valid, err := a.Validate(nil)
-		if valid {
+		_tq := tq.TqConfig{}
+		_tq.Headers = viper.GetStringMapString("headers")
+		err = _tq.Validate(a)
+		if err == nil {
 			os.Stderr.WriteString("Success: authentication is valid!")
 		} else {
 			os.Stderr.WriteString("Failure: authentication is not valid.")
