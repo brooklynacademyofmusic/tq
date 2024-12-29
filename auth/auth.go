@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"net"
 	"regexp"
 	"strings"
 
@@ -150,23 +149,13 @@ func (a Auth) Validate(client *tqClient.TessituraServiceWeb) (bool, error) {
 	response, err := client.Post.AuthenticateAuthenticate(&request)
 
 	if err != nil {
-		var dnsError *net.DNSError
-		var apiError *runtime.APIError
-		if errors.As(err, &dnsError) {
-			return false, dnsError
-		} else if errors.As(err, &apiError) {
-			return false, fmt.Errorf("login failed with http response: %v",
-				apiError.Response.(runtime.ClientResponse).Message(),
-			)
-		} else {
-			return false, err
-		}
+		return false, err
 	} else if response.IsSuccess() && response.Payload != nil {
 		if response.Payload.IsAuthenticated {
 			// Successful login!
 			return true, nil
 		} else {
-			return false, fmt.Errorf("login failed with Tessitura response: %v", response.Payload.Message)
+			return false, fmt.Errorf("login failed with Tessitura response: %v", response.Payload)
 		}
 	}
 	// Should never get here but who knows?
