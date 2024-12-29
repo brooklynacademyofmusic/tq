@@ -151,22 +151,22 @@ func TestAuth_Validate(t *testing.T) {
 	url := strings.Replace(server.URL, "https://", "", 1)
 
 	v, err := Auth{hostname: "not-a-host.com",
-		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate()
+		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "no such host", "validation fails when server is unreachable and provides useful info")
 
 	v, err = Auth{hostname: url + "/Not an endpoint/",
-		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate()
+		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "404", "validation fails when endpoint is incorrect and provides useful info")
 
 	v, err = Auth{hostname: url,
-		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate()
+		username: "user", usergroup: "group", location: "location", password: []byte("password")}.Validate(nil)
 	assert.True(t, v, "validation works when credentials are correct")
 	assert.NoError(t, err)
 
 	v, err = Auth{hostname: url,
-		username: "user", usergroup: "group", location: "location", password: []byte("wrongPass")}.Validate()
+		username: "user", usergroup: "group", location: "location", password: []byte("wrongPass")}.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "bad credentials", "validation failes when credentials are incorrect")
 
@@ -181,23 +181,23 @@ func TestAuth_Validate_Integration(t *testing.T) {
 
 	a1 := a
 	a1.hostname = "not-a-server.bam.org"
-	v, err := a1.Validate()
+	v, err := a1.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "no such host", "validation fails when server is unreachable and provides useful info")
 
 	a2 := a
 	a2.hostname = strings.ReplaceAll(a2.hostname, "/TessituraService", "")
-	v, err = a2.Validate()
+	v, err = a2.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "File or directory not found", "validation fails when endpoint is incorrect and provides useful info")
 
 	a.password = []byte(auth_secret)
-	v, err = a.Validate()
+	v, err = a.Validate(nil)
 	assert.True(t, v, "validation works when credentials are correct")
 	assert.NoError(t, err)
 
 	a.password = []byte("wrong_password")
-	v, err = a.Validate()
+	v, err = a.Validate(nil)
 	assert.False(t, v)
 	assert.ErrorContains(t, err, "Invalid Credentials", "validation fails when credentials are incorrect")
 

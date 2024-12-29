@@ -10,7 +10,7 @@ import (
 	"github.com/99designs/keyring"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/skysyzygy/tq/client"
+	tqClient "github.com/skysyzygy/tq/client"
 	"github.com/skysyzygy/tq/client/p_o_s_t"
 	"github.com/skysyzygy/tq/models"
 )
@@ -129,13 +129,15 @@ func List(k Keyring) ([]Auth, error) {
 }
 
 // Validate authentication with the Tessitura API server at a.Hostname
-func (a Auth) Validate() (bool, error) {
-	host := append(strings.SplitN(a.hostname, "/", 2), "")
-	ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
-		InsecureSkipVerify: true,
-	})
-	transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
-	client := client.New(transport, nil)
+func (a Auth) Validate(client *tqClient.TessituraServiceWeb) (bool, error) {
+	if client == nil {
+		host := append(strings.SplitN(a.hostname, "/", 2), "")
+		ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
+			InsecureSkipVerify: true,
+		})
+		transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
+		client = tqClient.New(transport, nil)
+	}
 
 	request := p_o_s_t.AuthenticateAuthenticateParams{
 		AuthenticationRequest: &models.AuthenticationRequest{
