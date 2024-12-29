@@ -106,6 +106,7 @@ func init() {
 	rootCmd.Version = rootCmd.Version + " (" + commit + ")"
 
 	_tq = new(tq.TqConfig)
+	flatHelp = &_tq.InFlat
 
 	//rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.tq)")
 	//handled early on for tq i/o initialization
@@ -209,7 +210,6 @@ func initConfig() {
 	_tq.InFmt = viper.GetString("in")
 	_tq.OutFmt = viper.GetString("out")
 	_tq.InFlat = viper.GetBool("inflat")
-	flatHelp = &_tq.InFlat
 	_tq.OutFlat = viper.GetBool("outflat")
 	_tq.DryRun = viper.GetBool("dryrun")
 
@@ -262,7 +262,8 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 		if _err != nil {
 			err = errors.Join(fmt.Errorf("cannot open input file %v for reading", inFile), _err, err)
 		}
-	} else {
+	}
+	if inFile == "" || _err != nil {
 		input = cmd.InOrStdin()
 	}
 
@@ -271,17 +272,14 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 		err = errors.Join(fmt.Errorf("bad login string in config file or environment variable"), _err, err)
 	}
 
-	err = errors.Join(a.Load(keys), err)
-
-	_tq.Login(a)
-	if valid, _err := a.Validate(_tq.TessituraServiceWeb); !valid || _err != nil {
-		err = errors.Join(fmt.Errorf("invalid login"), _err, err)
+	if _err := a.Load(keys); _err != nil {
+		err = errors.Join(_err, err)
 	}
 
-	if err != nil {
-		return err
+	if _err := _tq.Validate(a); _err != nil {
+		err = errors.Join(_err, err)
 	}
 
 	_tq.SetInput(input)
-	return nil
+	return err
 }

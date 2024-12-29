@@ -120,7 +120,7 @@ func (tq TqConfig) GetOutput() (out []byte, err error) {
 func (tq *TqConfig) SetOutput(test []byte) { tq.output = test }
 
 // Log in the Tessitura client with the given authentication info and cache the login data
-func (tq *TqConfig) Login(a auth.Auth) error {
+func (tq *TqConfig) Validate(a auth.Auth) error {
 
 	var clientAuths []runtime.ClientAuthInfoWriter
 
@@ -139,12 +139,19 @@ func (tq *TqConfig) Login(a auth.Auth) error {
 	}
 
 	host := append(strings.SplitN(a.Hostname(), "/", 2), "")
-	ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
+	ignoreCerts, err := httptransport.TLSClient(httptransport.TLSClientOptions{
 		InsecureSkipVerify: true,
 	})
+	if err != nil {
+		return err
+	}
 	transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
 	transport.DefaultAuthentication = httptransport.Compose(clientAuths...)
 	tq.TessituraServiceWeb = client.New(transport, nil)
+
+	if valid, err := a.Validate(tq.TessituraServiceWeb); !valid || err != nil {
+		return errors.Join(fmt.Errorf("invalid login"), err)
+	}
 
 	return nil
 }

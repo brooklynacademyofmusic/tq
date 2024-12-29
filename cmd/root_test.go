@@ -52,15 +52,14 @@ func Test_tqInit(t *testing.T) {
 	os.WriteFile("test.json", test_json, 0644)
 	defer os.Remove("test.json")
 
-	inFile = "test.json"
-	defer func() { inFile = "" }()
+	viper.Set("file", "test.json")
+	defer func() { viper.Set("file", "") }()
+
+	viper.Set("log", os.TempDir()+string(os.PathSeparator)+"test.log")
+	defer func() { viper.Set("log", "") }()
 
 	viper.Set("login", authString)
 
-	logFile = os.TempDir() + string(os.PathSeparator) + "test.log"
-	defer func() { logFile = "" }()
-
-	initLog()
 	var err error
 	// test that input file is getting read
 	tq.CaptureOutput(func() {
@@ -75,19 +74,18 @@ func Test_tqInit(t *testing.T) {
 }
 
 func Test_tqInit_Errors(t *testing.T) {
-	inFile = "test.json"
+	viper.Set("file", "test.json")
+	defer func() { viper.Set("file", "") }()
+
 	viper.Set("login", authString)
 	os.Remove(inFile)
 	var err error
 
-	initLog()
 	// test that absent input file throws an error
 	tq.CaptureOutput(func() {
 		err = test_cmd.Execute()
 	})
 	assert.Regexp(t, "cannot open input file .* for reading", err.Error())
-	inFile = ""
-
 }
 
 // Test that execute returns errors and output and handles compact flag
@@ -98,7 +96,6 @@ func Test_Execute(t *testing.T) {
 
 	assert.Contains(t, string(stdout), "Usage:")
 
-	initLog()
 	_tq.SetOutput([]byte(`{"test":"json"}`))
 	defer func() { _tq.SetOutput(nil) }()
 	stdout, _ = tq.CaptureOutput(Execute)

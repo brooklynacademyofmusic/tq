@@ -309,7 +309,7 @@ func Test_DoOne(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	query := []byte(`{"ConstituentId": "0"}`)
-	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	res, err := DoOne(*tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, []byte(nil), res)
@@ -341,7 +341,7 @@ func Test_DoOneNoop(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	query := []byte(`{"Not a key": 0}`)
-	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	res, err := DoOne(*tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, []byte(nil), res)
@@ -366,7 +366,7 @@ func Test_DoOneHeaders(t *testing.T) {
 	// Basic auth is passed and properly encoded
 	tq := TqConfig{}
 	query := []byte(`{"ConstituentId": "0"}`)
-	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
 	res, err := DoOne(tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, out, res)
 	assert.NoError(t, err)
@@ -375,7 +375,7 @@ func Test_DoOneHeaders(t *testing.T) {
 
 	// Additional headers are also passed
 	tq = TqConfig{Headers: map[string]string{"API-Key": "abc123"}}
-	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
 	res, err = DoOne(tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, out, res)
 	assert.NoError(t, err)
@@ -391,7 +391,7 @@ func Test_Do(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	tq.SetLogger(nil, false)
-	tq.Login(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	r, w, _ := os.Pipe()
 	tq.SetInput(r)
