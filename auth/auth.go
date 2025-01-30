@@ -138,7 +138,7 @@ func (a Auth) Validate(client *tqClient.TessituraServiceWeb) (bool, error) {
 		client = tqClient.New(transport, nil)
 	}
 
-	request := p_o_s_t.AuthenticateAuthenticateParams{
+	request := p_o_s_t.AuthenticateGenerateTokenParams{
 		AuthenticationRequest: &models.AuthenticationRequest{
 			UserName:        a.username,
 			UserGroup:       a.usergroup,
@@ -146,12 +146,12 @@ func (a Auth) Validate(client *tqClient.TessituraServiceWeb) (bool, error) {
 			Password:        string(a.password),
 		}}
 
-	response, err := client.Post.AuthenticateAuthenticate(&request)
+	response, err := client.Post.AuthenticateGenerateToken(&request)
 
 	if err != nil {
 		return false, err
 	} else if response.IsSuccess() && response.Payload != nil {
-		if response.Payload.IsAuthenticated {
+		if response.Payload.Token != "" {
 			// Successful login!
 			return true, nil
 		} else {
