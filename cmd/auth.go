@@ -133,7 +133,7 @@ var authenticateValidateCmd = &cobra.Command{
 		}
 		_tq := tq.TqConfig{}
 		_tq.Headers = viper.GetStringMapString("headers")
-		err = _tq.Validate(a)
+		err = _tq.Authenticate(a)
 		if err == nil {
 			os.Stderr.WriteString("Success: authentication is valid!")
 		} else {

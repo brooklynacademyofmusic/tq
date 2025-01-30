@@ -277,7 +277,7 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	if err == nil {
-		if _err := _tq.Validate(a); _err != nil {
+		if _err := _tq.Authenticate(a); _err != nil {
 			err = errors.Join(_err, err)
 		}
 	}

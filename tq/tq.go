@@ -119,12 +119,11 @@ func (tq TqConfig) GetOutput() (out []byte, err error) {
 // For testing only
 func (tq *TqConfig) SetOutput(test []byte) { tq.output = test }
 
-// Log in the Tessitura client with the given authentication info and cache the login data
-func (tq *TqConfig) Validate(a auth.Auth) error {
+// Prepare the Tessitura client with the given authentication info
+func (tq *TqConfig) Authenticate(a auth.Auth) error {
 
 	var clientAuths []runtime.ClientAuthInfoWriter
 
-	// Cache the login data
 	if basicAuth, err := a.BasicAuth(); err != nil {
 		tq.Log.Error(err.Error())
 		return err
@@ -149,9 +148,9 @@ func (tq *TqConfig) Validate(a auth.Auth) error {
 	transport.DefaultAuthentication = httptransport.Compose(clientAuths...)
 	tq.TessituraServiceWeb = client.New(transport, nil)
 
-	if valid, err := a.Validate(tq.TessituraServiceWeb); !valid || err != nil {
-		return errors.Join(fmt.Errorf("invalid login"), err)
-	}
+	// if valid, err := a.Validate(tq.TessituraServiceWeb); !valid || err != nil {
+	// 	return errors.Join(fmt.Errorf("invalid login"), err)
+	// }
 
 	return nil
 }

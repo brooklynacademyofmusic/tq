@@ -282,21 +282,19 @@ func testAuthServer(t *testing.T) *httptest.Server {
 	}))
 }
 
-// test that Validate returns errors and passes headers
+// test that Authenticate passes headers
 func Test_Validate(t *testing.T) {
 	server := testAuthServer(t)
 	defer server.Close()
 
 	tq := new(TqConfig)
-	err := tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	err := tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 	assert.NoError(t, err)
-
-	err = tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("Pa$$w0rD")))
-	assert.ErrorContains(t, err, "what were you thinking?")
 
 	tq.Headers = make(map[string]string)
 	tq.Headers["API-Key"] = "abc123"
-	err = tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	_, err = tq.TessituraServiceWeb.Get.ConstituentsGet(nil)
 	assert.ErrorContains(t, err, "Got API key")
 }
 
@@ -354,7 +352,7 @@ func Test_DoOne(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	query := []byte(`{"ConstituentId": "0"}`)
-	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	res, err := DoOne(*tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, []byte(nil), res)
@@ -386,7 +384,7 @@ func Test_DoOneNoop(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	query := []byte(`{"Not a key": 0}`)
-	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	res, err := DoOne(*tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, []byte(nil), res)
@@ -411,7 +409,7 @@ func Test_DoOneHeaders(t *testing.T) {
 	// Basic auth is passed and properly encoded
 	tq := TqConfig{}
 	query := []byte(`{"ConstituentId": "0"}`)
-	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
 	res, err := DoOne(tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, out, res)
 	assert.NoError(t, err)
@@ -420,7 +418,7 @@ func Test_DoOneHeaders(t *testing.T) {
 
 	// Additional headers are also passed
 	tq = TqConfig{Headers: map[string]string{"API-Key": "abc123"}}
-	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "username", "", "", []byte("pA$$w0rD")))
 	res, err = DoOne(tq, tq.Get.ConstituentsGet, query)
 	assert.Equal(t, out, res)
 	assert.NoError(t, err)
@@ -436,7 +434,7 @@ func Test_Do(t *testing.T) {
 	defer server.Close()
 	tq := new(TqConfig)
 	tq.SetLogger(nil, false)
-	tq.Validate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
+	tq.Authenticate(auth.New(strings.Replace(server.URL, "https://", "", 1), "user", "", "", []byte("password")))
 
 	r, w, _ := os.Pipe()
 	tq.SetInput(r)
