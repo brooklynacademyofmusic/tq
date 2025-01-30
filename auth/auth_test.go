@@ -113,15 +113,12 @@ func TestAuth_Delete(t *testing.T) {
 func TestAuth_Validate(t *testing.T) {
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		req := models.AuthenticationRequest{}
-		var (
-			isAuthenticated bool
-			message         string
-		)
+		var res any
 
 		reqBody, _ := io.ReadAll(r.Body)
 		json.Unmarshal(reqBody, &req)
 
-		if r.RequestURI != "/Security/Authenticate" {
+		if r.RequestURI != "/Security/Authenticate/Token/Generate" {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("Not Found"))
 			return
@@ -132,18 +129,17 @@ func TestAuth_Validate(t *testing.T) {
 			req.UserGroup == "group" &&
 			req.Password == "password" &&
 			req.MachineLocation == "location" {
-			isAuthenticated = true
+			res = models.AuthenticationTokenResponse{
+				Token: "abc123",
+			}
 		} else {
-			isAuthenticated = false
-			message = "bad credentials"
+			w.WriteHeader(400)
+			res = models.ErrorMessage{
+				Description: "bad credentials",
+			}
 		}
 
-		res := models.AuthenticationResponse{
-			IsAuthenticated: isAuthenticated,
-			Message:         message,
-		}
-
-		resBody, _ := json.Marshal(&res)
+		resBody, _ := json.Marshal(res)
 		w.Write(resBody)
 	}))
 	defer server.Close()
