@@ -133,8 +133,8 @@ var authenticateValidateCmd = &cobra.Command{
 		}
 		_tq := tq.TqConfig{}
 		_tq.Headers = viper.GetStringMapString("headers")
-		err = _tq.Authenticate(a)
-		if err == nil {
+		val, err := a.Validate(_tq.TessituraServiceWeb)
+		if val && err == nil {
 			os.Stderr.WriteString("Success: authentication is valid!")
 		} else {
 			os.Stderr.WriteString("Failure: authentication is not valid.")
