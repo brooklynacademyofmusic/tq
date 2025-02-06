@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -133,7 +134,9 @@ var authenticateValidateCmd = &cobra.Command{
 		}
 		_tq := tq.TqConfig{}
 		_tq.Headers = viper.GetStringMapString("headers")
-		val, err := a.Validate(_tq.TessituraServiceWeb)
+		err = _tq.Authenticate(a)
+		val, _err := a.Validate(_tq.TessituraServiceWeb)
+		err = errors.Join(_err, err)
 		if val && err == nil {
 			os.Stderr.WriteString("Success: authentication is valid!")
 		} else {
