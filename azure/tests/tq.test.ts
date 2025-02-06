@@ -1,10 +1,10 @@
 import { HttpRequest, InvocationContext } from "@azure/functions";
 import { tq_verb, tq_auth } from "../src/functions/tq";
-import {test, jest, expect} from '@jest/globals';
+import {test, vitest, expect} from 'vitest';
 import { spawnSync, SpawnSyncReturns } from 'child_process';
 
-jest.mock('child_process');
-const spawnSyncMocked = jest.mocked(spawnSync);
+vitest.mock('child_process');
+const spawnSyncMocked = vitest.mocked(spawnSync);
 spawnSyncMocked.mockReturnValue(<SpawnSyncReturns<string>>{
     pid: 0,
     output: null,
