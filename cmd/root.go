@@ -106,7 +106,6 @@ func init() {
 	rootCmd.Version = rootCmd.Version + " (" + commit + ")"
 
 	_tq = new(tq.TqConfig)
-	flatHelp = &_tq.InFlat
 
 	//rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.tq)")
 	//handled early on for tq i/o initialization
@@ -210,6 +209,7 @@ func initConfig() {
 	_tq.InFmt = viper.GetString("in")
 	_tq.OutFmt = viper.GetString("out")
 	_tq.InFlat = viper.GetBool("inflat")
+	flatHelp = &_tq.InFlat
 	_tq.OutFlat = viper.GetBool("outflat")
 	_tq.DryRun = viper.GetBool("dryrun")
 
