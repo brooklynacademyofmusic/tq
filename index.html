@@ -167,7 +167,7 @@ go build -o bin/tq .
 - Unix 
   - Pass
 - Azure 
-  - Key Vault: enabled as the key manager whenever the environment variable <code>AZURE_KEY_VAULT</code> is present and set to the name of the key vault</p>
+  - Key Vault: enabled as the key manager whenever the environment variable <code>AZURE_KEY_VAULT</code> is present and set to the fully qualified name of the key vault (e.g. <code>https://myvault.vault.azure.net</code>)</p>
 <pre><code class="language-shell">tq auth add --host hostname --user username --group usergroup --location location
 # Password: ******
 </code></pre>
@@ -202,9 +202,10 @@ tq --inflat create steps &lt;&lt;&lt; '{&quot;plan.Id&quot;: 12345, &quot;type.I
 </code></pre>
 <h2 id="flags">flags:</h2>
 <ul>
-<li><strong>-c, --compact</strong> compact instead of indented output</li>
+<li><strong>-c, --compact</strong> compact instead of indented output </li>
 <li><strong>-n, --dryrun</strong> don't actually do anything, just show what would have happened</li>
 <li><strong>-f, --file</strong> input file to read (default is to read from stdin)</li>
+<li><strong>--headers</strong> additional headers to include in outgoing requests in name=value,name=value format (or in JSON format when used in the TQ_HEADERS environment variable)</li>
 <li><strong>--highlight</strong> render json with syntax highlighting; default is to use highlighting when output is to terminal</li>
 <li><strong>-i, --in</strong> input format (csv or json; default is json); csv implies --inflat</li>
 <li><strong>--inflat</strong> use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format</li>
@@ -214,9 +215,11 @@ tq --inflat create steps &lt;&lt;&lt; '{&quot;plan.Id&quot;: 12345, &quot;type.I
 <li><strong>--outflat</strong> use output flattened by JSONPath dot notation</li>
 <li><strong>-v, --verbose</strong> turns on additional diagnostic output</li>
 </ul>
-<h4 id="configuration-file">configuration file:</h4>
+<h3 id="configuration-file">configuration file:</h3>
 <p>A yaml configuration file <code>.tq</code> placed in your home directory can be used to set defaults for these flags; it is also used to save the current authentication method. See <code>tq auth select --help</code> for more information. </p>
-<h3 id="verbs">verbs:</h3>
+<h3 id="environment-variables">environment variables:</h3>
+<p>All flag options can also be set as environment variables, in all caps, with a <code>TQ_</code> prefix, for example, <code>TQ_OUT=csv</code> will set the output format to csv. </p>
+<h2 id="verbs">verbs:</h2>
 <ul>
 <li><strong>authenticate</strong> : Authenticate with the Tessitura API</li>
 <li><strong>create</strong> :       Create entities in Tessitura</li>
@@ -361,5 +364,5 @@ EOF
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-11-04 22:37:16.004799+00:00
+Build Date UTC : 2025-03-01 21:49:27.701287+00:00
 -->
