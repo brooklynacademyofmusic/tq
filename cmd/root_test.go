@@ -130,15 +130,14 @@ func Test_Help(t *testing.T) {
 	snaps.WithConfig(snaps.Filename("help_create_constituents"), snaps.Update(update)).MatchSnapshot(t, string(stdout))
 
 	viper.Set("inflat", true)
-	fmt.Printf("_tq.InFlat: %v\nflatHelp: %v\nhighlight: %v\n", _tq.InFlat, flatHelp, highlight)
 	stdout, _ = tq.CaptureOutput(Execute)
+	fmt.Printf("_tq.InFlat: %v\nflatHelp: %v\nhighlight: %v\n", _tq.InFlat, *flatHelp, highlight)
 	snaps.WithConfig(snaps.Filename("help_create_constituents_flat"), snaps.Update(update)).MatchSnapshot(t, string(stdout))
 
 	viper.Set("highlight", true)
 	viper.Set("inflat", false)
-	fmt.Printf("_tq.InFlat: %v\nflatHelp: %v\nhighlight: %v\n", _tq.InFlat, flatHelp, highlight)
 	defer func() { highlight = false }()
-	rootCmd.SetArgs([]string{"help", "create", "constituents"})
 	stdout, _ = tq.CaptureOutput(Execute)
+	fmt.Printf("_tq.InFlat: %v\nflatHelp: %v\nhighlight: %v\n", _tq.InFlat, *flatHelp, highlight)
 	snaps.WithConfig(snaps.Filename("help_create_constituents_highlighted"), snaps.Update(update)).MatchSnapshot(t, string(stdout))
 }
