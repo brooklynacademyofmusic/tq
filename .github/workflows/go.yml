@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env: 
-      AZURE_KEY_VAULT: ${{ secrets.AZURE_KEY_VAULT }}
+      TEST_AZURE_KEY_VAULT: ${{ secrets.AZURE_KEY_VAULT }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -29,7 +29,7 @@ jobs:
         go-version: '1.22'
       
     - name: Test
-      run: go test -skip "_Integration" -v -race -coverprofile coverage.out -covermode atomic ./...
+      run: go test -skip "_Integration" -v -race -coverprofile coverage.out -covermode atomic -parallel 1 ./...
       
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

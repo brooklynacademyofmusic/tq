@@ -21,20 +21,24 @@ func TestAuth_Azure(t *testing.T) {
 	}
 
 	// Try to connect to a vault I don't have access to
-	keys_azure.Connect("not-my-vault")
+	keys_azure.Connect("https://not-my-vault.vault.azure.net")
 	assert.Error(t, keys_azure.Set(item), "not authorized")
 
 	// Connect to a vault I have access to
-	keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
-
-	// Add a key
-	assert.NoError(t, keys_azure.Set(item))
+	keys_azure.Connect(os.Getenv("TEST_AZURE_KEY_VAULT"))
 
 	// List keys
 	keys, err := keys_azure.Keys()
 	assert.NoError(t, err)
-	assert.Len(t, keys, 1)
-	assert.Equal(t, []string{item.Key}, keys)
+	originalLen := len(keys)
+	originalKeys := keys
+
+	// Add a key
+	assert.NoError(t, keys_azure.Set(item))
+	// List keys again
+	keys, err = keys_azure.Keys()
+	assert.NoError(t, err)
+	assert.Contains(t, keys, item.Key)
 
 	// Get a key
 	item_test, err := keys_azure.Get(item.Key)
@@ -53,7 +57,8 @@ func TestAuth_Azure(t *testing.T) {
 	// List keys again
 	keys, err = keys_azure.Keys()
 	assert.NoError(t, err)
-	assert.Len(t, keys, 0)
+	assert.Len(t, keys, originalLen)
+	assert.Equal(t, originalKeys, keys)
 
 }
 
@@ -66,16 +71,20 @@ func TestAuth_Azure_ComplexKey(t *testing.T) {
 	}
 
 	// Connect to a vault I have access to
-	keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
-
-	// Add a key
-	assert.NoError(t, keys_azure.Set(item))
+	keys_azure.Connect(os.Getenv("TEST_AZURE_KEY_VAULT"))
 
 	// List keys
 	keys, err := keys_azure.Keys()
 	assert.NoError(t, err)
-	assert.Len(t, keys, 1)
-	assert.Equal(t, []string{item.Key}, keys)
+	originalLen := len(keys)
+	originalKeys := keys
+
+	// Add a key
+	assert.NoError(t, keys_azure.Set(item))
+	// List keys again
+	keys, err = keys_azure.Keys()
+	assert.NoError(t, err)
+	assert.Contains(t, keys, item.Key)
 
 	// Get a key
 	item_test, err := keys_azure.Get(item.Key)
@@ -94,6 +103,7 @@ func TestAuth_Azure_ComplexKey(t *testing.T) {
 	// List keys again
 	keys, err = keys_azure.Keys()
 	assert.NoError(t, err)
-	assert.Len(t, keys, 0)
+	assert.Len(t, keys, originalLen)
+	assert.Equal(t, originalKeys, keys)
 
 }

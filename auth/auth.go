@@ -3,14 +3,13 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"net"
 	"regexp"
 	"strings"
 
 	"github.com/99designs/keyring"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/skysyzygy/tq/client"
+	tqClient "github.com/skysyzygy/tq/client"
 	"github.com/skysyzygy/tq/client/p_o_s_t"
 	"github.com/skysyzygy/tq/models"
 )
@@ -129,15 +128,17 @@ func List(k Keyring) ([]Auth, error) {
 }
 
 // Validate authentication with the Tessitura API server at a.Hostname
-func (a Auth) Validate() (bool, error) {
-	host := append(strings.SplitN(a.hostname, "/", 2), "")
-	ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
-		InsecureSkipVerify: true,
-	})
-	transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
-	client := client.New(transport, nil)
+func (a Auth) Validate(client *tqClient.TessituraServiceWeb) (bool, error) {
+	if client == nil {
+		host := append(strings.SplitN(a.hostname, "/", 2), "")
+		ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
+			InsecureSkipVerify: true,
+		})
+		transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
+		client = tqClient.New(transport, nil)
+	}
 
-	request := p_o_s_t.AuthenticateAuthenticateParams{
+	request := p_o_s_t.AuthenticateGenerateTokenParams{
 		AuthenticationRequest: &models.AuthenticationRequest{
 			UserName:        a.username,
 			UserGroup:       a.usergroup,
@@ -145,26 +146,16 @@ func (a Auth) Validate() (bool, error) {
 			Password:        string(a.password),
 		}}
 
-	response, err := client.Post.AuthenticateAuthenticate(&request)
+	response, err := client.Post.AuthenticateGenerateToken(&request)
 
 	if err != nil {
-		var dnsError *net.DNSError
-		var apiError *runtime.APIError
-		if errors.As(err, &dnsError) {
-			return false, dnsError
-		} else if errors.As(err, &apiError) {
-			return false, fmt.Errorf("login failed with http response: %v",
-				apiError.Response.(runtime.ClientResponse).Message(),
-			)
-		} else {
-			return false, err
-		}
+		return false, err
 	} else if response.IsSuccess() && response.Payload != nil {
-		if response.Payload.IsAuthenticated {
+		if response.Payload.Token != "" {
 			// Successful login!
 			return true, nil
 		} else {
-			return false, fmt.Errorf("login failed with Tessitura response: %v", response.Payload.Message)
+			return false, fmt.Errorf("login failed with Tessitura response: %v", response.Payload)
 		}
 	}
 	// Should never get here but who knows?

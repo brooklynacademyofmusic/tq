@@ -28,11 +28,11 @@ import (
 	"io"
 	"os"
 	"runtime/debug"
+	"slices"
 	"strings"
 	"syscall"
 
 	"github.com/99designs/keyring"
-
 	"github.com/skysyzygy/tq/auth"
 	"github.com/skysyzygy/tq/tq"
 	"github.com/spf13/cobra"
@@ -87,7 +87,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLog, initKeys)
 
 	// enable case insensitive command names
 	cobra.EnableCaseInsensitive = true
@@ -109,26 +109,30 @@ func init() {
 
 	//rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.tq)")
 	//handled early on for tq i/o initialization
-	rootCmd.PersistentFlags().StringVarP(&inFile, "file", "f", "", "input file to read (default is to read from stdin)")
-	rootCmd.PersistentFlags().StringVarP(&logFile, "log", "l", "", "log file to write to (default is no log)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "turns on additional diagnostic output")
+	rootCmd.PersistentFlags().StringP("file", "f", "", "input file to read (default is to read from stdin)")
+	rootCmd.PersistentFlags().StringP("log", "l", "", "log file to write to (default is no log)")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "turns on additional diagnostic output")
+	rootCmd.PersistentFlags().StringToString("headers", nil, "additional headers to include in outgoing requests in name=value,name=value format")
 
 	//used within tq for wrangling formats
-	rootCmd.PersistentFlags().StringVarP(&_tq.InFmt, "in", "i", "json", "input format (csv or json; default is json); csv implies --inflat")
-	rootCmd.PersistentFlags().StringVarP(&_tq.OutFmt, "out", "o", "json", "output format (csv or json; default is json); csv implies --outflat")
-	rootCmd.PersistentFlags().BoolVar(&_tq.InFlat, "inflat", false, "use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format")
-	flatHelp = &_tq.InFlat
-	rootCmd.PersistentFlags().BoolVar(&_tq.OutFlat, "outflat", false, "use output flattened by JSONPath dot notation")
-	rootCmd.PersistentFlags().BoolVarP(&_tq.DryRun, "dryrun", "n", false, "don't actually do anything, just show what would have happened")
+	rootCmd.PersistentFlags().StringP("in", "i", "json", "input format (csv or json; default is json); csv implies --inflat")
+	rootCmd.PersistentFlags().StringP("out", "o", "json", "output format (csv or json; default is json); csv implies --outflat")
+	rootCmd.PersistentFlags().Bool("inflat", false, "use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format")
+	rootCmd.PersistentFlags().Bool("outflat", false, "use output flattened by JSONPath dot notation")
+	rootCmd.PersistentFlags().BoolP("dryrun", "n", false, "don't actually do anything, just show what would have happened")
 
 	//used at output stage only
-	rootCmd.PersistentFlags().BoolVarP(&compact, "compact", "c", false, "compact instead of indented output")
-	rootCmd.PersistentFlags().BoolVar(&highlight, "highlight", false, "render json with syntax highlighting; default is to use highlighting when output is to terminal")
-	rootCmd.PersistentFlags().BoolVar(&noHighlight, "no-highlight", false, "render json without syntax highlighting; default is to use highlighting when output is to terminal")
+	rootCmd.PersistentFlags().BoolP("compact", "c", false, "compact instead of indented output")
+	rootCmd.PersistentFlags().Bool("highlight", false, "render json with syntax highlighting; default is to use highlighting when output is to terminal")
+	rootCmd.PersistentFlags().Bool("no-highlight", false, "render json without syntax highlighting; default is to use highlighting when output is to terminal")
 
 	// Hide global flags from auth command
 	authenticateCmd.SetUsageFunc(func(cmd *cobra.Command) error {
-		authenticateCmd.InheritedFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = true })
+		authenticateCmd.InheritedFlags().VisitAll(func(f *pflag.Flag) {
+			if !slices.Contains([]string{"headers"}, f.Name) {
+				f.Hidden = true
+			}
+		})
 		return rootCmd.UsageFunc()(cmd)
 	})
 
@@ -159,16 +163,6 @@ Query:`).
 			"flagUsagesWrapped": flagUsagesWrapped,
 			"exampleWrapped":    exampleWrapped,
 		})
-
-	if os.Getenv("AZURE_KEY_VAULT") != "" {
-		var keys_azure auth.Keyring_Azure
-		keys_azure.Connect(os.Getenv("AZURE_KEY_VAULT"))
-		keys = keys_azure
-	} else {
-		keys, _ = keyring.Open(keyring.Config{
-			ServiceName: "tq",
-		})
-	}
 
 }
 
@@ -201,10 +195,30 @@ func initConfig() {
 		}
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
-	viper.SetEnvPrefix("TQ")
+	viper.SetEnvPrefix("TQ")          // environment variables must start with 'TQ_'
+	viper.AutomaticEnv()              // read in environment variables that match
+	viper.BindPFlags(rootCmd.Flags()) // enable all flags with viper
 
-	initLog()
+	//handled early on for tq i/o initialization
+	inFile = viper.GetString("file")
+	logFile = viper.GetString("log")
+	verbose = viper.GetBool("verbose")
+	_tq.Headers = viper.GetStringMapString("headers")
+
+	//used within tq for wrangling formats
+	_tq.InFmt = viper.GetString("in")
+	_tq.OutFmt = viper.GetString("out")
+	_tq.InFlat = viper.GetBool("inflat")
+	flatHelp = &_tq.InFlat
+	_tq.OutFlat = viper.GetBool("outflat")
+	_tq.DryRun = viper.GetBool("dryrun")
+
+	//used at output stage only
+	compact = viper.GetBool("compact")
+	highlight = viper.GetBool("highlight")
+	noHighlight = viper.GetBool("no-highlight")
+
+	viper.SetDefault("login", "localhost|user|group|location")
 }
 
 func initLog() {
@@ -220,6 +234,21 @@ func initLog() {
 	_tq.SetLogger(log, verbose)
 }
 
+func initKeys() {
+	// get keys from Azure or the local keyring... but only if they haven't already been set
+	if keys == nil {
+		if vault, set := os.LookupEnv("AZURE_KEY_VAULT"); set {
+			var keys_azure auth.Keyring_Azure
+			keys_azure.Connect(vault)
+			keys = keys_azure
+		} else {
+			keys, _ = keyring.Open(keyring.Config{
+				ServiceName: "tq",
+			})
+		}
+	}
+}
+
 // Initializes a tq instance with input from file or stdin
 // and logs it in using the default authentication method.
 // Shouldn't be called until the last minute in order to make sure
@@ -233,32 +262,26 @@ func initTq(cmd *cobra.Command, args []string) (err error) {
 		if _err != nil {
 			err = errors.Join(fmt.Errorf("cannot open input file %v for reading", inFile), _err, err)
 		}
-	} else {
+	}
+	if inFile == "" || _err != nil {
 		input = cmd.InOrStdin()
 	}
 
-	viper.SetDefault("login", "localhost|user|group|location")
-
-	a, _err := auth.FromString(viper.GetString("Login"))
+	a, _err := auth.FromString(viper.GetString("login"))
 	if _err != nil {
-		err = errors.Join(fmt.Errorf("bad login string in config file"), _err, err)
+		err = errors.Join(fmt.Errorf("bad login string in config file or environment variable"), _err, err)
 	}
 
-	err = errors.Join(a.Load(keys), err)
-
-	if valid, _err := a.Validate(); !valid || _err != nil {
-		err = errors.Join(fmt.Errorf("invalid login"), _err, err)
+	if _err := a.Load(keys); _err != nil {
+		err = errors.Join(_err, err)
 	}
 
-	if err != nil {
-		authString, _ := a.String()
-		_tq.Log.Error(err.Error(),
-			"logFile", logFile,
-			"jsonFile", inFile,
-			"auth", authString)
-		return err
+	if err == nil {
+		if _err := _tq.Authenticate(a); _err != nil {
+			err = errors.Join(_err, err)
+		}
 	}
 
 	_tq.SetInput(input)
-	return _tq.Login(a)
+	return err
 }

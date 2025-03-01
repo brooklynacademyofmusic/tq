@@ -66,16 +66,17 @@ Flags:
                                       {"Atype":"string", "ConstituencyIds":"string", "ConstituentGroups":"string", "ConstituentID":"string", "Dup":"string", "Fn":"string", "IncludeAffiliates":"string", "Key":"string", "ListID":"string", "Ln":"string", "Op":"string", "Page":"string", "PageSize":"string", "Post":"string", "Q":"string", "Street":"string", "Type":"string", "Value":"string"}
 
 Global Flags:
-  -c, --compact       compact instead of indented output
-  -n, --dryrun        don't actually do anything, just show what would have happened
-  -f, --file string   input file to read (default is to read from stdin)
-      --highlight     render json with syntax highlighting; default is to use highlighting when output is to terminal
-  -i, --in string     input format (csv or json; default is json); csv implies --inflat
-      --inflat        use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format
-  -l, --log string    log file to write to (default is no log)
-      --no-highlight  render json without syntax highlighting; default is to use highlighting when output is to terminal
-  -o, --out string    output format (csv or json; default is json); csv implies --outflat
-      --outflat       use output flattened by JSONPath dot notation
-  -v, --verbose       turns on additional diagnostic output
+  -c, --compact                 compact instead of indented output
+  -n, --dryrun                  don't actually do anything, just show what would have happened
+  -f, --file string             input file to read (default is to read from stdin)
+      --headers stringToString  additional headers to include in outgoing requests in name=value,name=value format
+      --highlight               render json with syntax highlighting; default is to use highlighting when output is to terminal
+  -i, --in string               input format (csv or json; default is json); csv implies --inflat
+      --inflat                  use input flattened by JSONPath dot notation. Combining this with --help will show the flattened format
+  -l, --log string              log file to write to (default is no log)
+      --no-highlight            render json without syntax highlighting; default is to use highlighting when output is to terminal
+  -o, --out string              output format (csv or json; default is json); csv implies --outflat
+      --outflat                 use output flattened by JSONPath dot notation
+  -v, --verbose                 turns on additional diagnostic output
 
 ---

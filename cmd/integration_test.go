@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/skysyzygy/tq/tq"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +24,7 @@ func Test_Get_Integration_empty(t *testing.T) {
 	// test without payload
 	rootCmd.SetIn(sendToStdin(""))
 	rootCmd.SetArgs([]string{"get", "constituents"})
-	tq.CaptureOutput(func() { err = rootCmd.Execute() })
+	err = rootCmd.Execute()
 	assert.ErrorContains(t, err, "500")
 }
 
@@ -34,7 +33,7 @@ func Test_Get_Integration_invalid(t *testing.T) {
 	// test with invalid payload
 	rootCmd.SetIn(sendToStdin(`{"constituentId":"0"}`))
 	rootCmd.SetArgs([]string{"get", "constituents"})
-	tq.CaptureOutput(func() { err = rootCmd.Execute() })
+	err = rootCmd.Execute()
 	assert.ErrorContains(t, err, "Constituent Id cannot be 0 or Null")
 }
 
@@ -43,9 +42,8 @@ func Test_Get_Integration_valid(t *testing.T) {
 	// test with valid payload
 	rootCmd.SetArgs([]string{"get", "constituents"})
 	rootCmd.SetIn(sendToStdin(`{"constituentId":"1"}`))
-	_, stderr := tq.CaptureOutput(func() { err = rootCmd.Execute() })
+	err = rootCmd.Execute()
 	assert.NoError(t, err)
-	assert.Regexp(t, "Using config file: .+tq\n$", string(stderr))
 	out, err := _tq.GetOutput()
 	assert.Contains(t, string(out), "Dummy")
 	assert.NoError(t, err)

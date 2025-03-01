@@ -30,8 +30,8 @@ type TqConfig struct {
 	// the Tessitura API client
 	*client.TessituraServiceWeb
 
-	// Basic auth for requests
-	basicAuth runtime.ClientAuthInfoWriter
+	// Additional headers to add to requests, consumed by apiAuth
+	Headers map[string]string
 
 	// TODO: Bearer token for requests
 	// tokenAuth func(*runtime.ClientOperation)
@@ -119,24 +119,38 @@ func (tq TqConfig) GetOutput() (out []byte, err error) {
 // For testing only
 func (tq *TqConfig) SetOutput(test []byte) { tq.output = test }
 
-// Log in the Tessitura client with the given authentication info and cache the login data
-func (tq *TqConfig) Login(a auth.Auth) error {
+// Prepare the Tessitura client with the given authentication info
+func (tq *TqConfig) Authenticate(a auth.Auth) error {
 
-	// Cache the login data
+	var clientAuths []runtime.ClientAuthInfoWriter
+
 	if basicAuth, err := a.BasicAuth(); err != nil {
 		tq.Log.Error(err.Error())
 		return err
 	} else {
-		tq.basicAuth = basicAuth
+		clientAuths = append(clientAuths, basicAuth)
+	}
+
+	if len(tq.Headers) > 0 {
+		for k, v := range tq.Headers {
+			clientAuths = append(clientAuths, httptransport.APIKeyAuth(k, "header", v))
+		}
 	}
 
 	host := append(strings.SplitN(a.Hostname(), "/", 2), "")
-	ignoreCerts, _ := httptransport.TLSClient(httptransport.TLSClientOptions{
+	ignoreCerts, err := httptransport.TLSClient(httptransport.TLSClientOptions{
 		InsecureSkipVerify: true,
 	})
+	if err != nil {
+		return err
+	}
 	transport := httptransport.NewWithClient(host[0], host[1], []string{"https"}, ignoreCerts)
-	transport.DefaultAuthentication = tq.basicAuth
+	transport.DefaultAuthentication = httptransport.Compose(clientAuths...)
 	tq.TessituraServiceWeb = client.New(transport, nil)
+
+	// if valid, err := a.Validate(tq.TessituraServiceWeb); !valid || err != nil {
+	// 	return errors.Join(fmt.Errorf("invalid login"), err)
+	// }
 
 	return nil
 }

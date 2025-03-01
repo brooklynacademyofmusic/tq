@@ -4,11 +4,13 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/skysyzygy/tq/auth"
+	"github.com/skysyzygy/tq/tq"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/term"
@@ -105,6 +107,7 @@ var authenticateSelectCmd = &cobra.Command{
 	Use:     "select",
 	Aliases: []string{"s", "sel"},
 	Short:   `Select a Tessitura API authentication method`,
+	PreRun:  func(cmd *cobra.Command, args []string) { getEnv() },
 	RunE: func(cmd *cobra.Command, args []string) error {
 		a := auth.New(*hostname, *username, *usergroup, *location, nil)
 		err := a.Load(keys)
@@ -129,8 +132,12 @@ var authenticateValidateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		valid, err := a.Validate()
-		if valid {
+		_tq := tq.TqConfig{}
+		_tq.Headers = viper.GetStringMapString("headers")
+		err = _tq.Authenticate(a)
+		val, _err := a.Validate(_tq.TessituraServiceWeb)
+		err = errors.Join(_err, err)
+		if val && err == nil {
 			os.Stderr.WriteString("Success: authentication is valid!")
 		} else {
 			os.Stderr.WriteString("Failure: authentication is not valid.")
@@ -151,8 +158,9 @@ func init() {
 		authenticateDeleteCmd, authenticateSelectCmd, authenticateValidateCmd)
 }
 
-// set parameters based on environment variable. Only used for auth add and auth validate.
-// auth select would be a no-op (because it's already selected) and auth delete would be dangerous
+// set parameters based on environment variable. Only used for auth add, sel, and validate.
+// Auth delete could be dangerous because the existence of an environment variable would override the
+// command line arguments
 func getEnv() {
 	if *hostname == "" && *username == "" && *usergroup == "" && *location == "" {
 		if a, err := auth.FromString(viper.GetString("Login")); err == nil {
